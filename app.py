@@ -5,17 +5,16 @@ import random
 import json
 import pyrebase
 
-# Firebase configuration
 # Firebase configuration (replace with your values)
 firebase_config = {
     "apiKey": st.secrets["firebase"]["apiKey"],
     "authDomain": st.secrets["firebase"]["authDomain"],
-    "databaseURL": st.secrets["firebase"]["databaseURL"],
     "projectId": st.secrets["firebase"]["projectId"],
     "storageBucket": st.secrets["firebase"]["storageBucket"],
     "messagingSenderId": st.secrets["firebase"]["messagingSenderId"],
     "appId": st.secrets["firebase"]["appId"],
-    "measurementId": st.secrets["firebase"]["measurementId"]
+    "measurementId": st.secrets["firebase"]["measurementId"],
+    "webClientId": st.secrets["firebase"]["webClientId"]
 }
 
 firebase = pyrebase.initialize_app(firebase_config)
@@ -24,48 +23,11 @@ auth = firebase.auth()
 # Streamlit UI
 st.title("Login with Google")
 
-# Login button
-login_button = st.button("Login with Google")
-
-if login_button:
-    try:
-        user = auth.sign_in_with_email_and_password("your_email@example.com", "your_password")
-        st.success(f"Welcome {user['email']}!")
-    except Exception as e:
-        st.error(f"Login failed: {e}")
-# Convert Streamlit secrets AttrDict to a dictionary
-firebase_secrets = dict(st.secrets["firebase"])
-
-# Initialize Firebase with the correct format
-if not firebase_admin._apps:
-    cred = credentials.Certificate(firebase_secrets)
-    firebase_admin.initialize_app(cred)
-
-# Connect to Firestore
-db = firestore.client()
-
-# Function to handle user authentication
 def authenticate_user():
-    st.title("Login with Email & Password")
-
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-
-    if st.button("Login"):
-        try:
-            user = auth.sign_in_with_email_and_password(email, password)
-            st.session_state["user"] = user
-            st.success("Login successful! 🎉")
-            st.experimental_rerun()
-        except Exception as e:
-            st.error(f"Login failed: {e}")
-
-    if st.button("Sign Up"):
-        try:
-            user = auth.create_user_with_email_and_password(email, password)
-            st.success("Account created! Please log in. ✅")
-        except Exception as e:
-            st.error(f"Signup failed: {e}")
+    google_login_url = f"https://accounts.google.com/o/oauth2/auth?client_id={firebase_config['webClientId']}&redirect_uri=http://localhost:8501&response_type=token&scope=email profile"
+    
+    if st.button("Login with Google"):
+        st.markdown(f'<a href="{google_login_url}" target="_blank">Click here to authenticate</a>', unsafe_allow_html=True)
 
 def save_user_to_firebase(user):
     users_ref = db.collection("users").document(user["email"])
@@ -79,6 +41,12 @@ def save_user_to_firebase(user):
             "level": 1,
             "consecutive_bonus": 0
         })
+
+if not firebase_admin._apps:
+    cred = credentials.Certificate(json.loads(json.dumps(dict(st.secrets["firebase"]))))
+    firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 def generate_challenge(level):
     challenges = ["Sudoku", "Kakuro", "Reasoning", "Math Puzzle"]
