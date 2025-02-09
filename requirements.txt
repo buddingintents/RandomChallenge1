@@ -2,3 +2,4 @@ streamlit
 firebase_admin
 streamlit-authenticator
 pyrebase4
+setuptools>=65.0
