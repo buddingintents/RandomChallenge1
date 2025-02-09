@@ -8,8 +8,9 @@ import json
 firebase_secrets = dict(st.secrets["firebase"])
 
 # Initialize Firebase with the correct format
-cred = credentials.Certificate(firebase_secrets)
-firebase_admin.initialize_app(cred)
+if not firebase_admin._apps:
+    cred = credentials.Certificate(firebase_secrets)
+    firebase_admin.initialize_app(cred)
 
 # Connect to Firestore
 db = firestore.client()
