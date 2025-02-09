@@ -14,7 +14,6 @@ firebase_config = {
     "messagingSenderId": st.secrets["firebase"].get("messagingSenderId", ""),
     "appId": st.secrets["firebase"].get("appId", ""),
     "measurementId": st.secrets["firebase"].get("measurementId", ""),
-    "webClientId": st.secrets["firebase"].get("webClientId", ""),
     "databaseURL": st.secrets["firebase"].get("databaseURL", "")
 }
 
@@ -23,25 +22,26 @@ if not firebase_config["databaseURL"]:
     firebase_config.pop("databaseURL", None)
 
 firebase = pyrebase.initialize_app(firebase_config)
-auth = firebase.auth()
+auth_firebase = firebase.auth()
 
 # Streamlit UI
 st.title("Login with Google")
 
 def authenticate_user():
-    google_login_url = f"https://testproject-d7b3c.firebaseapp.com/__/auth/handler"
-
-    if st.button("Login with Google"):
-        st.markdown(f'<a href="{google_login_url}" target="_blank">Click here to authenticate</a>', unsafe_allow_html=True)
-
-    #if not firebase_config["webClientId"]:
-        #st.error("Missing webClientId in Streamlit secrets! Check your Firebase settings.")
-        #return
-    
-    #google_login_url = f"https://accounts.google.com/o/oauth2/auth?client_id={firebase_config['webClientId']}&redirect_uri=http://localhost:8501&response_type=token&scope=email profile"
-    
-    #if st.button("Login with Google"):
-        #st.markdown(f'<a href="{google_login_url}" target="_blank">Click here to authenticate</a>', unsafe_allow_html=True)
+    try:
+        # Use Firebase Authentication to sign in with Google
+        provider = auth_firebase.GoogleAuthProvider()
+        result = auth_firebase.sign_in_with_popup(provider)
+        user = result.user
+        st.session_state["user"] = {
+            "name": user.display_name,
+            "email": user.email,
+            "image": user.photo_url
+        }
+        save_user_to_firebase(st.session_state["user"])
+        st.experimental_rerun()
+    except Exception as e:
+        st.error(f"Authentication failed: {e}")
 
 def save_user_to_firebase(user):
     users_ref = db.collection("users").document(user["email"])
