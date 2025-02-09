@@ -29,6 +29,12 @@ auth = firebase.auth()
 st.title("Login with Google")
 
 def authenticate_user():
+      google_login_url = f"https://testproject-d7b3c.firebaseapp.com/__/auth/handler"
+
+    if st.button("Login with Google"):
+        st.markdown(f'<a href="{google_login_url}" target="_blank">Click here to authenticate</a>', unsafe_allow_html=True)
+
+
     if not firebase_config["webClientId"]:
         st.error("Missing webClientId in Streamlit secrets! Check your Firebase settings.")
         return
