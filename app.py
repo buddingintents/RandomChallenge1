@@ -6,6 +6,7 @@ import json
 import pyrebase
 
 # Firebase configuration
+# Firebase configuration (replace with your values)
 firebase_config = {
     "apiKey": st.secrets["firebase"]["apiKey"],
     "authDomain": st.secrets["firebase"]["authDomain"],
@@ -13,7 +14,8 @@ firebase_config = {
     "projectId": st.secrets["firebase"]["projectId"],
     "storageBucket": st.secrets["firebase"]["storageBucket"],
     "messagingSenderId": st.secrets["firebase"]["messagingSenderId"],
-    "appId": st.secrets["firebase"]["appId"]
+    "appId": st.secrets["firebase"]["appId"],
+    "measurementId": st.secrets["firebase"]["measurementId"]
 }
 
 firebase = pyrebase.initialize_app(firebase_config)
@@ -42,13 +44,28 @@ if not firebase_admin._apps:
 # Connect to Firestore
 db = firestore.client()
 
+# Function to handle user authentication
 def authenticate_user():
-    st.title("Login with Google")
-    user = st.experimental_user_auth("google")
-    if user:
-        st.session_state["user"] = user
-        save_user_to_firebase(user)
-        st.experimental_rerun()
+    st.title("Login with Email & Password")
+
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        try:
+            user = auth.sign_in_with_email_and_password(email, password)
+            st.session_state["user"] = user
+            st.success("Login successful! 🎉")
+            st.experimental_rerun()
+        except Exception as e:
+            st.error(f"Login failed: {e}")
+
+    if st.button("Sign Up"):
+        try:
+            user = auth.create_user_with_email_and_password(email, password)
+            st.success("Account created! Please log in. ✅")
+        except Exception as e:
+            st.error(f"Signup failed: {e}")
 
 def save_user_to_firebase(user):
     users_ref = db.collection("users").document(user["email"])
