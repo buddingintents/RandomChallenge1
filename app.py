@@ -2,9 +2,11 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import auth, firestore, credentials
 import random
+import json
 
-# Firebase initialization
-cred = credentials.Certificate("path/to/firebase/credentials.json")
+# Load Firebase credentials from Streamlit secrets
+firebase_secrets = st.secrets["firebase"]
+cred = credentials.Certificate(json.loads(json.dumps(firebase_secrets)))
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
