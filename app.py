@@ -31,19 +31,17 @@ st.title("Login with Google")
 def authenticate_user():
     google_login_url = f"https://testproject-d7b3c.firebaseapp.com/__/auth/handler"
 
-    if st.button("Login with Google"):
+  if st.button("Login with Google"):
         st.markdown(f'<a href="{google_login_url}" target="_blank">Click here to authenticate</a>', unsafe_allow_html=True)
 
-'''
-    if not firebase_config["webClientId"]:
-        st.error("Missing webClientId in Streamlit secrets! Check your Firebase settings.")
-        return
+    #if not firebase_config["webClientId"]:
+        #st.error("Missing webClientId in Streamlit secrets! Check your Firebase settings.")
+        #return
     
-    google_login_url = f"https://accounts.google.com/o/oauth2/auth?client_id={firebase_config['webClientId']}&redirect_uri=http://localhost:8501&response_type=token&scope=email profile"
+    #google_login_url = f"https://accounts.google.com/o/oauth2/auth?client_id={firebase_config['webClientId']}&redirect_uri=http://localhost:8501&response_type=token&scope=email profile"
     
-    if st.button("Login with Google"):
-        st.markdown(f'<a href="{google_login_url}" target="_blank">Click here to authenticate</a>', unsafe_allow_html=True)
-'''
+    #if st.button("Login with Google"):
+        #st.markdown(f'<a href="{google_login_url}" target="_blank">Click here to authenticate</a>', unsafe_allow_html=True)
 
 def save_user_to_firebase(user):
     users_ref = db.collection("users").document(user["email"])
