@@ -4,10 +4,14 @@ from firebase_admin import auth, firestore, credentials
 import random
 import json
 
-# Load Firebase credentials from Streamlit secrets
-firebase_secrets = st.secrets["firebase"]
-cred = credentials.Certificate(json.loads(json.dumps(firebase_secrets)))
+# Convert Streamlit secrets AttrDict to a dictionary
+firebase_secrets = dict(st.secrets["firebase"])
+
+# Initialize Firebase with the correct format
+cred = credentials.Certificate(firebase_secrets)
 firebase_admin.initialize_app(cred)
+
+# Connect to Firestore
 db = firestore.client()
 
 def authenticate_user():
