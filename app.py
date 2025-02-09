@@ -14,7 +14,7 @@ firebase_config = {
     "messagingSenderId": st.secrets["firebase"]["messagingSenderId"],
     "appId": st.secrets["firebase"]["appId"],
     "measurementId": st.secrets["firebase"]["measurementId"],
-    "webClientId": st.secrets["firebase"]["webClientId"]
+    "webClientId": st.secrets["firebase"].get("webClientId", "")
 }
 
 firebase = pyrebase.initialize_app(firebase_config)
@@ -24,6 +24,10 @@ auth = firebase.auth()
 st.title("Login with Google")
 
 def authenticate_user():
+    if not firebase_config["webClientId"]:
+        st.error("Missing webClientId in Streamlit secrets! Check your Firebase settings.")
+        return
+    
     google_login_url = f"https://accounts.google.com/o/oauth2/auth?client_id={firebase_config['webClientId']}&redirect_uri=http://localhost:8501&response_type=token&scope=email profile"
     
     if st.button("Login with Google"):
