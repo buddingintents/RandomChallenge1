@@ -34,7 +34,7 @@ def authenticate_user():
     if st.button("Login with Google"):
         st.markdown(f'<a href="{google_login_url}" target="_blank">Click here to authenticate</a>', unsafe_allow_html=True)
 
-
+'''
     if not firebase_config["webClientId"]:
         st.error("Missing webClientId in Streamlit secrets! Check your Firebase settings.")
         return
@@ -43,6 +43,7 @@ def authenticate_user():
     
     if st.button("Login with Google"):
         st.markdown(f'<a href="{google_login_url}" target="_blank">Click here to authenticate</a>', unsafe_allow_html=True)
+'''
 
 def save_user_to_firebase(user):
     users_ref = db.collection("users").document(user["email"])
