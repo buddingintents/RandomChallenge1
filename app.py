@@ -3,7 +3,34 @@ import firebase_admin
 from firebase_admin import auth, firestore, credentials
 import random
 import json
+import pyrebase
 
+# Firebase configuration
+firebase_config = {
+    "apiKey": st.secrets["firebase"]["apiKey"],
+    "authDomain": st.secrets["firebase"]["authDomain"],
+    "databaseURL": st.secrets["firebase"]["databaseURL"],
+    "projectId": st.secrets["firebase"]["projectId"],
+    "storageBucket": st.secrets["firebase"]["storageBucket"],
+    "messagingSenderId": st.secrets["firebase"]["messagingSenderId"],
+    "appId": st.secrets["firebase"]["appId"]
+}
+
+firebase = pyrebase.initialize_app(firebase_config)
+auth = firebase.auth()
+
+# Streamlit UI
+st.title("Login with Google")
+
+# Login button
+login_button = st.button("Login with Google")
+
+if login_button:
+    try:
+        user = auth.sign_in_with_email_and_password("your_email@example.com", "your_password")
+        st.success(f"Welcome {user['email']}!")
+    except Exception as e:
+        st.error(f"Login failed: {e}")
 # Convert Streamlit secrets AttrDict to a dictionary
 firebase_secrets = dict(st.secrets["firebase"])
 
